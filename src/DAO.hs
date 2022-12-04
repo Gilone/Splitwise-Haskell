@@ -17,7 +17,7 @@ batchQuery s = evalStateT (do {MS.init}) MS.dictionary
 
 
 -- | [Input]: The BillingID
--- [Output]: Maybe Day (Nothing | Just Day), indicating the date when the input repo was marked or Nothing
+-- [Output]: Empty IO
 deleteExpense :: Int -> IO [MD.ExpenseRecord]
 deleteExpense s = evalStateT (do {MS.init}) MS.dictionary
 
@@ -30,13 +30,31 @@ fechMockData = do
     let record1 = MD.ExpenseRecord {
         MD.billingID = 1,
         MD.title = "KFC",
-        MD.description = Just "payment for for KFC",
+        MD.description = Just "payment for KFC",
         MD.creditor = "JasonKing",
-        MD.debtors = ["HAO", "Bill", "Joey"],
+        MD.debtors = ["JasonKing", "HAO", "Bill", "Joey"],
         MD.amount = 93.03,
         MD.createDate = date
     }
-    return [record1]
+    let record2 = MD.ExpenseRecord {
+        MD.billingID = 2,
+        MD.title = "Uber",
+        MD.description = Just "Uber fare",
+        MD.creditor = "HAO",
+        MD.debtors = ["HAO", "Bill", "Joey"],
+        MD.amount = 36.07,
+        MD.createDate = date
+    }
+    let record3 = MD.ExpenseRecord {
+        MD.billingID = 3,
+        MD.title = "Grocery",
+        MD.description = Just "Grocery payment",
+        MD.creditor = "Bill",
+        MD.debtors = ["Bill", "JasonKing", "Hao"],
+        MD.amount = 26.17,
+        MD.createDate = date
+    }
+    return [record1, record2, record3]
 
 parseDay :: String -> Maybe Day
 parseDay s = DTF.parseTimeM True DTF.defaultTimeLocale "%Y-%-m-%-d" s
