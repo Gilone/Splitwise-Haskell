@@ -35,7 +35,7 @@ import qualified Data.Text as DT
 import qualified Brick.Main as M
 
 drawDashboard :: VS.AppState -> [Widget ()]
-drawDashboard (VS.AppState l _ _) = [ui]
+drawDashboard (VS.AppState l _ _ _) = [ui]
     where
         label = str "Activity Dashboard: item " <+> cur <+> str " of " <+> total
         cur = case l^.L.listSelectedL of
@@ -54,18 +54,18 @@ drawDashboard (VS.AppState l _ _) = [ui]
 
 
 dashboardEvent :: VS.AppState -> T.BrickEvent () e -> T.EventM () (T.Next VS.AppState)
-dashboardEvent s@(VS.AppState l _ _) (T.VtyEvent e) =
+dashboardEvent s@(VS.AppState l _ _ _) (T.VtyEvent e) =
     case e of
         V.EvKey V.KEsc [] -> do
-            newState <- liftIO $ VS.getEmptyAppState True
+            newState <- liftIO $ VS.getEmptyAppState True 0
             M.halt newState
 
         V.EvKey (V.KChar 'a') [] -> do
-            newState <- liftIO $ VS.getEmptyAppState False
+            newState <- liftIO $ VS.getEmptyAppState False 1
             M.halt newState
 
         V.EvKey (V.KChar 's') [] -> do
-            newState <- liftIO $ VS.getEmptyAppState False
+            newState <- liftIO $ VS.getEmptyAppState False 2
             M.halt newState
 
         V.EvKey (V.KChar 'd')  [] -> 
@@ -81,9 +81,9 @@ dashboardEvent s _ = M.continue s
 
 
 handleTrendingList :: V.Event -> VS.AppState -> T.EventM () (VS.AppState)
-handleTrendingList e s@(VS.AppState theList f m) = do
+handleTrendingList e s@(VS.AppState theList f p m) = do
     nextList <- L.handleListEvent e theList
-    return $ VS.AppState nextList f m
+    return $ VS.AppState nextList f p m
 
 
 listDrawElement :: Bool -> MD.ExpenseRecord -> Widget ()
