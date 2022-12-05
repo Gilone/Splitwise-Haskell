@@ -2,6 +2,7 @@ module SplitAlgorithm where
 
 import qualified Model.Data as MD
 import qualified View.State as VS
+import Data.List
 
 
 -- get the balance map
@@ -27,6 +28,21 @@ import qualified View.State as VS
 -- getSuggestionsGreedy :: [MD.ExpenseRecord] -> [MD.SplitSuggestion]
 -- getSuggestionsGreedy [] = []
 -- getSuggestionsGreedy rs = 
+
+-- auto_drive :: Int -> Int
+-- auto_drive speed = mywhile (90,speed)
+
+-- mywhile x =
+--   if condition x then mywhile (next_version_of x) -- if condition met, pass x to the function next_verion_of, next, recursion back to mywhile function 
+--   else final_version_of x -- otherwise, it would have the final speed
+
+-- condition (speed_limit,speed) = speed > 0 && speed /= speed_limit 
+
+-- next_version_of (speed_limit,speed) =
+--   if speed > speed_limit then (speed_limit,speed-1) else (speed_limit,speed+1) -- converge the speed to the speed limit
+
+-- final_version_of (speed_limit,speed) = speed
+
 
 
 --  exact algorithm O(2^n * n^2)
