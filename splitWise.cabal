@@ -28,6 +28,7 @@ library
       DAO
       Model.Data
       Model.Storage
+      SplitAlgorithm
       View.ActivityDashboard
       View.AddExpense
       View.Settlement
@@ -39,11 +40,13 @@ library
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       base >=4.7 && <5
-    , brick ==0.65
+    , brick >=0.65
     , containers
     , microlens
     , microlens-th
     , mtl
+    , split
+    , sqlite-simple
     , text
     , time
     , vector
@@ -59,12 +62,14 @@ executable splitWise-exe
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
-    , brick ==0.65
+    , brick >=0.65
     , containers
     , microlens
     , microlens-th
     , mtl
+    , split
     , splitWise
+    , sqlite-simple
     , text
     , time
     , vector
@@ -81,12 +86,14 @@ test-suite splitWise-test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
-    , brick ==0.65
+    , brick >=0.65
     , containers
     , microlens
     , microlens-th
     , mtl
+    , split
     , splitWise
+    , sqlite-simple
     , text
     , time
     , vector

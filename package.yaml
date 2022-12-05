@@ -21,7 +21,7 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.7 && < 5
-- brick == 0.65
+- brick >= 0.65
 - time
 - containers
 - mtl
@@ -30,6 +30,8 @@ dependencies:
 - microlens-th
 - text
 - vty
+- sqlite-simple
+- split
 
 ghc-options:
 - -Wall

@@ -16,16 +16,17 @@ data AppState = AppState {
 getInitAppState :: Bool -> IO (AppState)
 getInitAppState isMock
     | isMock == False = do
-        ers <- DAO.batchQuery ""
+        ers <- DAO.batchQuery False
         return $  AppState  (L.list () (Vec.fromList ers) 1) False 0 isMock
     | otherwise = do
-        ers <- DAO.fechMockData
+        _ <- DAO.loadMockData
+        ers <- DAO.batchQuery True
         return $  AppState  (L.list () (Vec.fromList ers) 1) False 0 isMock
 
 updateAppState :: AppState -> IO (AppState)
 updateAppState (AppState _ f p m) =
     do
-        ers <- DAO.batchQuery ""
+        ers <- DAO.batchQuery m
         return $  AppState  (L.list () (Vec.fromList ers) 1) f p m
 
 getEmptyAppState :: Bool -> Int -> IO (AppState)

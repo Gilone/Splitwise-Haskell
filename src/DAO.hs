@@ -1,32 +1,70 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE CPP #-}
 
 module DAO where
 
-import Control.Monad.State (evalStateT)
+import Control.Monad.State (evalStateT, forM)
 import Data.Time.Clock (getCurrentTime, utctDay)
 import Data.Time (Day)
 import Data.Maybe (fromMaybe)
+import Data.Text
+import Control.Applicative
+import Database.SQLite.Simple
+import Database.SQLite.Simple.FromRow
+import qualified Data.List.Split as S (splitOn)
 import qualified Model.Data as MD
 import qualified Model.Storage as MS
 import qualified Data.Time.Format as DTF
-
--- | [Input]: Activity name
--- [Output]: A list of MD.ExpenseRecord values
-batchQuery :: String -> IO [MD.ExpenseRecord]
-batchQuery s = evalStateT (do {MS.init}) MS.dictionary
-
+import GHC.Generics
 
 -- | [Input]: The BillingID
 -- [Output]: Empty IO
-deleteExpense :: Int -> IO [MD.ExpenseRecord]
-deleteExpense s = evalStateT (do {MS.init}) MS.dictionary
+deleteExpense :: Bool -> Int -> IO ()
+-- deleteExpense s = evalStateT (do {MS.init}) MS.dictionary
+deleteExpense isMock id = do
+    conn <- open "split.db"
+    execute_ conn (creatStm isMock)
+    execute conn (deleteStm isMock) (Only id)
+    close conn
+    return ()
 
+-- | [Input]: Activity table name
+-- [Output]: Empty IO
+addExpense :: Bool -> MD.ExpenseRecord -> IO ()
+addExpense isMock er = do
+    conn <- open "split.db"
+    execute_ conn (creatStm isMock)
+    execute conn (insertStm isMock) (ExpenseField (MD.billingID er) (MD.title er) (fromMaybe "No description" (MD.description er)) (MD.creditor er) (serializeList (MD.debtors er)) (MD.amount er) (show (MD.createDate er)))
+    close conn
+    return ()
+
+-- | [Input]: Activity table name
+-- [Output]: A list of MD.ExpenseRecord values
+batchQuery :: Bool -> IO [MD.ExpenseRecord]
+-- batchQuery s = evalStateT (do {MS.init}) MS.dictionary
+batchQuery isMock = do
+    conn <- open "split.db"
+    execute_ conn (creatStm isMock)
+    r <- query_ conn (queryStm isMock)
+    close conn
+    forM r $ \(billingID, title, description, creditor, debtors, amount, createDate) -> return (MD.ExpenseRecord {
+                                                                                            MD.billingID = billingID,
+                                                                                            MD.title = title,
+                                                                                            MD.description = if description == "No description" then Nothing else Just description,
+                                                                                            MD.creditor = creditor,
+                                                                                            MD.debtors = deserializeToList debtors,
+                                                                                            MD.amount = amount,
+                                                                                            MD.createDate = (read createDate) :: Day
+                                                                                        })
+    
 
 -- [Output]: A list of mock expense records
-fechMockData :: IO [MD.ExpenseRecord]
-fechMockData = do
+loadMockData :: IO ()
+loadMockData = do
     today <- utctDay <$> getCurrentTime
-    let date = fromMaybe today (parseDay "2010-1-1")
+    let date = fromMaybe today (parseDay "2022-11-11")
     let record1 = MD.ExpenseRecord {
         MD.billingID = 1,
         MD.title = "KFC",
@@ -54,7 +92,65 @@ fechMockData = do
         MD.amount = 26.17,
         MD.createDate = date
     }
-    return [record1, record2, record3]
+    let dropTable = "DROP TABLE IF EXISTS mock"
+    execDDL dropTable
+    addExpense True record1
+    addExpense True record2
+    addExpense True record3
+
+-------------------------------------------------------------
+-- Below are private functions supposed not to be exported --
+-------------------------------------------------------------
 
 parseDay :: String -> Maybe Day
 parseDay s = DTF.parseTimeM True DTF.defaultTimeLocale "%Y-%-m-%-d" s
+
+creatStm:: Bool -> Query
+creatStm isMock
+    | isMock == False = "CREATE TABLE IF NOT EXISTS splitWise (billingID INTEGER PRIMARY KEY, title TEXT, description TEXT, creditor TEXT, debtors TEXT, amount REAL, createDate TEXT)"
+    | otherwise = "CREATE TABLE IF NOT EXISTS mock (billingID INTEGER PRIMARY KEY, title TEXT, description TEXT, creditor TEXT, debtors TEXT, amount REAL, createDate TEXT)"
+
+insertStm:: Bool -> Query
+insertStm isMock
+    | isMock == False = "INSERT INTO splitWise (billingID, title, description, creditor, debtors, amount, createDate) VALUES (?, ?, ?, ?, ?, ?, ?)"
+    | otherwise = "INSERT INTO mock (billingID, title, description, creditor, debtors, amount, createDate) VALUES (?, ?, ?, ?, ?, ?, ?)"
+
+deleteStm:: Bool -> Query
+deleteStm isMock
+    | isMock == False = "DELETE FROM splitWise WHERE billingID = ?"
+    | otherwise = "DELETE FROM mock WHERE billingID = ?"
+
+queryStm:: Bool -> Query
+queryStm isMock
+    | isMock == False = "SELECT billingID, title, description, creditor, debtors, amount, createDate from splitWise"
+    | otherwise = "SELECT billingID, title, description, creditor, debtors, amount, createDate from mock"
+
+data ExpenseField = ExpenseField {
+    billingID :: Int,
+    title :: String,
+    description:: String,
+    creditor :: String,
+    debtors :: String,
+    amount :: Float,
+    createDate :: String
+} deriving (Show, Eq, Generic)
+
+instance FromRow ExpenseField where
+    fromRow = ExpenseField <$> field <*> field <*> field <*> field <*> field <*> field <*> field
+
+instance ToRow ExpenseField where
+  toRow (ExpenseField billingID title description creditor debtors amount createDate) = toRow (billingID, title, description, creditor, debtors, amount, createDate)
+
+serializeList :: [String] -> String
+serializeList (e:[]) = e
+serializeList (e:ls) = e ++ "," ++ serializeList ls
+serializeList _ = ""
+
+deserializeToList :: String -> [String]
+deserializeToList s = S.splitOn "," s
+
+execDDL :: Query -> IO()
+execDDL q = do
+    conn <- open "split.db"
+    execute_ conn q
+    close conn

@@ -54,7 +54,7 @@ drawDashboard (VS.AppState l _ _ _) = [ui]
 
 
 dashboardEvent :: VS.AppState -> T.BrickEvent () e -> T.EventM () (T.Next VS.AppState)
-dashboardEvent s@(VS.AppState l _ _ _) (T.VtyEvent e) =
+dashboardEvent s@(VS.AppState l _ _ m) (T.VtyEvent e) =
     case e of
         V.EvKey V.KEsc [] -> do
             newState <- liftIO $ VS.getEmptyAppState True 0
@@ -72,13 +72,12 @@ dashboardEvent s@(VS.AppState l _ _ _) (T.VtyEvent e) =
             case l^.L.listSelectedL of
                 Nothing -> M.continue s
                 Just i -> do        
-                    _ <- liftIO $ DAO.deleteExpense (MD.billingID ((l^.L.listElementsL) Vec.! i))
+                    _ <- liftIO $ DAO.deleteExpense m (MD.billingID ((l^.L.listElementsL) Vec.! i))
                     newState <- liftIO $ VS.updateAppState s
                     M.continue newState 
 
         ev -> M.continue =<< handleTrendingList ev s
 dashboardEvent s _ = M.continue s
-
 
 handleTrendingList :: V.Event -> VS.AppState -> T.EventM () (VS.AppState)
 handleTrendingList e s@(VS.AppState theList f p m) = do

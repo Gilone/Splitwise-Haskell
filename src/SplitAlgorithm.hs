@@ -1,9 +1,11 @@
+module SplitAlgorithm where
+
 import qualified Model.Data as MD
 import qualified View.State as VS
 
 
 -- get the balance map
-getTheBalanceMap :: 
+-- getTheBalanceMap :: 
 --         balances = {}
 --         for A, B, amount in transactions:
 --             balances.setdefault(A, 0)
@@ -18,18 +20,18 @@ getTheBalanceMap ::
 
 -- heuristic algorithm (O(n))
 
-getPayerList :: 
+-- getPayerList :: 
 
-getReceiverList :: 
+-- getReceiverList :: 
 
-getSuggestionsGreedy :: [MD.ExpenseRecord] -> [MD.SplitSuggestion]
-getSuggestionsGreedy [] = []
-getSuggestionsGreedy rs = 
+-- getSuggestionsGreedy :: [MD.ExpenseRecord] -> [MD.SplitSuggestion]
+-- getSuggestionsGreedy [] = []
+-- getSuggestionsGreedy rs = 
 
 
 --  exact algorithm O(2^n * n^2)
 
-getSuggestionsDFS :: [MD.ExpenseRecord] -> [MD.SplitSuggestion]
+-- getSuggestionsDFS :: [MD.ExpenseRecord] -> [MD.SplitSuggestion]
 
 
 
