@@ -68,3 +68,5 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - splitWise
+    - tasty
+    - tasty-hunit

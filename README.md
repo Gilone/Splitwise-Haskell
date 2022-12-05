@@ -74,7 +74,13 @@ We can abstract this part of the program into a view, which are representations 
 
 
 ## Setup
+To run the program:
 ```
 $stack build
 $stack run
+```
+
+To run the unit tests:
+```
+$stack test
 ```

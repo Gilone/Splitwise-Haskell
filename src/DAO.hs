@@ -15,14 +15,12 @@ import Database.SQLite.Simple
 import Database.SQLite.Simple.FromRow
 import qualified Data.List.Split as S (splitOn)
 import qualified Model.Data as MD
-import qualified Model.Storage as MS
 import qualified Data.Time.Format as DTF
 import GHC.Generics
 
 -- | [Input]: The BillingID
 -- [Output]: Empty IO
 deleteExpense :: Bool -> Int -> IO ()
--- deleteExpense s = evalStateT (do {MS.init}) MS.dictionary
 deleteExpense isMock id = do
     conn <- open "split.db"
     execute_ conn (creatStm isMock)
@@ -43,7 +41,6 @@ addExpense isMock er = do
 -- | [Input]: Activity table name
 -- [Output]: A list of MD.ExpenseRecord values
 batchQuery :: Bool -> IO [MD.ExpenseRecord]
--- batchQuery s = evalStateT (do {MS.init}) MS.dictionary
 batchQuery isMock = do
     conn <- open "split.db"
     execute_ conn (creatStm isMock)
@@ -60,7 +57,7 @@ batchQuery isMock = do
                                                                                         })
     
 
--- [Output]: A list of mock expense records
+-- [Output]: Empty IO
 loadMockData :: IO ()
 loadMockData = do
     today <- utctDay <$> getCurrentTime
@@ -107,8 +104,8 @@ parseDay s = DTF.parseTimeM True DTF.defaultTimeLocale "%Y-%-m-%-d" s
 
 creatStm:: Bool -> Query
 creatStm isMock
-    | isMock == False = "CREATE TABLE IF NOT EXISTS splitWise (billingID INTEGER PRIMARY KEY, title TEXT, description TEXT, creditor TEXT, debtors TEXT, amount REAL, createDate TEXT)"
-    | otherwise = "CREATE TABLE IF NOT EXISTS mock (billingID INTEGER PRIMARY KEY, title TEXT, description TEXT, creditor TEXT, debtors TEXT, amount REAL, createDate TEXT)"
+    | isMock == False = "CREATE TABLE IF NOT EXISTS splitWise (billingID INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, description TEXT, creditor TEXT, debtors TEXT, amount REAL, createDate TEXT)"
+    | otherwise = "CREATE TABLE IF NOT EXISTS mock (billingID INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, description TEXT, creditor TEXT, debtors TEXT, amount REAL, createDate TEXT)"
 
 insertStm:: Bool -> Query
 insertStm isMock

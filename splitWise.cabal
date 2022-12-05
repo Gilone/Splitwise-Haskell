@@ -27,7 +27,7 @@ library
   exposed-modules:
       DAO
       Model.Data
-      Model.Storage
+      Model.Lib
       SplitAlgorithm
       View.ActivityDashboard
       View.AddExpense
@@ -80,6 +80,7 @@ test-suite splitWise-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      DAOTest
       Paths_splitWise
   hs-source-dirs:
       test
@@ -94,6 +95,8 @@ test-suite splitWise-test
     , split
     , splitWise
     , sqlite-simple
+    , tasty
+    , tasty-hunit
     , text
     , time
     , vector
