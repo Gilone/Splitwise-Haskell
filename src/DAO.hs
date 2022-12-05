@@ -34,7 +34,7 @@ addExpense :: Bool -> MD.ExpenseRecord -> IO ()
 addExpense isMock er = do
     conn <- open "split.db"
     execute_ conn (creatStm isMock)
-    execute conn (insertStm isMock) (ExpenseField (MD.billingID er) (MD.title er) (fromMaybe "No description" (MD.description er)) (MD.creditor er) (serializeList (MD.debtors er)) (MD.amount er) (show (MD.createDate er)))
+    execute conn (insertStm isMock) (ExpenseField (MD.title er) (fromMaybe "No description" (MD.description er)) (MD.creditor er) (serializeList (MD.debtors er)) (MD.amount er) (show (MD.createDate er)))
     close conn
     return ()
 
@@ -109,8 +109,8 @@ creatStm isMock
 
 insertStm:: Bool -> Query
 insertStm isMock
-    | isMock == False = "INSERT INTO splitWise (billingID, title, description, creditor, debtors, amount, createDate) VALUES (?, ?, ?, ?, ?, ?, ?)"
-    | otherwise = "INSERT INTO mock (billingID, title, description, creditor, debtors, amount, createDate) VALUES (?, ?, ?, ?, ?, ?, ?)"
+    | isMock == False = "INSERT INTO splitWise (title, description, creditor, debtors, amount, createDate) VALUES (?, ?, ?, ?, ?, ?)"
+    | otherwise = "INSERT INTO mock (title, description, creditor, debtors, amount, createDate) VALUES (?, ?, ?, ?, ?, ?)"
 
 deleteStm:: Bool -> Query
 deleteStm isMock
@@ -123,7 +123,6 @@ queryStm isMock
     | otherwise = "SELECT billingID, title, description, creditor, debtors, amount, createDate from mock"
 
 data ExpenseField = ExpenseField {
-    billingID :: Int,
     title :: String,
     description:: String,
     creditor :: String,
@@ -133,10 +132,10 @@ data ExpenseField = ExpenseField {
 } deriving (Show, Eq, Generic)
 
 instance FromRow ExpenseField where
-    fromRow = ExpenseField <$> field <*> field <*> field <*> field <*> field <*> field <*> field
+    fromRow = ExpenseField <$> field <*> field <*> field <*> field <*> field <*> field
 
 instance ToRow ExpenseField where
-  toRow (ExpenseField billingID title description creditor debtors amount createDate) = toRow (billingID, title, description, creditor, debtors, amount, createDate)
+  toRow (ExpenseField title description creditor debtors amount createDate) = toRow (title, description, creditor, debtors, amount, createDate)
 
 serializeList :: [String] -> String
 serializeList (e:[]) = e
