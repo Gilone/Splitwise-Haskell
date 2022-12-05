@@ -2,7 +2,7 @@
 
 module DAO where
 
-import           Control.Monad.State (evalStateT)
+import Control.Monad.State (evalStateT)
 import Data.Time.Clock (getCurrentTime, utctDay)
 import Data.Time (Day)
 import Data.Maybe (fromMaybe)
