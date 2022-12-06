@@ -113,6 +113,10 @@ trim = f . f
 parseDay :: String -> Maybe Day
 parseDay s = DTF.parseTimeM True DTF.defaultTimeLocale "%Y-%-m-%-d" s
 
+truncate' :: Float -> Int -> Float
+truncate' x n = (fromIntegral (round (x * t))) / t
+    where t = 10^n
+
 ----------------------------- helper functions -----------------------------
 
 theVFApp :: M.App St e Name
@@ -148,7 +152,7 @@ startFilter = do
         -- lan = if all isSpace s1 then "*" else (trim s1)
         title = trim s1
         dat = fromMaybe defaultDat (parseDay $ trim s2)
-        amount = fromMaybe 0 (readMaybe s3)
+        amount = truncate' (fromMaybe 0 (readMaybe s3)) 2
         creditor = trim s4
         debtors = splitOn "," (trim s5)
 
@@ -162,6 +166,6 @@ startFilter = do
         MD.createDate = dat
     }
     addExpense True expense
-    
+
     state <- liftIO $ VS.getEmptyAppState False 0
     return state
