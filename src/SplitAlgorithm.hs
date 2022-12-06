@@ -2,11 +2,38 @@ module SplitAlgorithm where
 
 import qualified Model.Data as MD
 import qualified View.State as VS
+import qualified Data.Map.Strict as HashMap
 import Data.List
 
 
 -- get the balance map
--- getTheBalanceMap :: 
+
+getTheInfoFromRecordToList :: MD.ExpenseRecord -> [(String, String, Float)]
+getTheInfoFromRecordToList (MD.ExpenseRecord billingID title description creditor debtors amount createDate) = map combi debtors where
+    combi :: String -> (String, String, Float)
+    combi x = (creditor, x, amount)
+
+addOneInHashmap :: String -> HashMap.Map String Int -> Float -> HashMap.Map String Int
+addOneInHashmap s oldMap amount = newMap
+   where newMap = HashMap.insertWith (+) s amount oldMap
+
+minisOneInHashmap :: String -> HashMap.Map String Int -> Float -> HashMap.Map String Int
+minisOneInHashmap s oldMap amount = newMap
+   where newMap = HashMap.insertWith (+) s (0 - amount) oldMap
+
+getBalanceMapFromTupleList :: [(String, String, Float)] -> HashMap.Map String Float
+getBalanceMapFromTupleList [] = HashMap.empty
+getBalanceMapFromTupleList (t:ts) = updateMap t (getBalanceMapFromTupleList ts) where
+    updateMap tu, mp = minisOneInHashmap (get1 tu) (minisOneInHashmap (get2 tu) mp)
+    get1 (a,_,_) = a
+    get2 (_,b,_) = b
+
+getBalanceMap :: [MD.ExpenseRecord] -> HashMap.Map String Float
+getBalanceMap [] = []
+getBalanceMap er = HashMap.filter (\x -> x/=0) (getBalanceMapFromTupleList tupleList)
+    where tupleList = concat $ map getTheInfoFromRecordToList er 
+
+-- def getBalanceMap: 
 --         balances = {}
 --         for A, B, amount in transactions:
 --             balances.setdefault(A, 0)
@@ -21,13 +48,32 @@ import Data.List
 
 -- heuristic algorithm (O(n))
 
--- getPayerList :: 
+getPayerMap :: HashMap.Map String Int -> HashMap.Map String Int
+getPayerMap HashMap.empty = []
+getPayerMap mp = HashMap.filter (\x -> x>0) mp
 
--- getReceiverList :: 
+getReceiverMap :: HashMap.Map String Int -> HashMap.Map String Int
+getReceiverMap HashMap.empty = []
+getReceiverMap mp = HashMap.filter (\x -> x<0) mp
 
--- getSuggestionsGreedy :: [MD.ExpenseRecord] -> [MD.SplitSuggestion]
--- getSuggestionsGreedy [] = []
--- getSuggestionsGreedy rs = 
+getSuggestionsGreedy :: [MD.ExpenseRecord] -> [MD.SplitSuggestion]
+getSuggestionsGreedy [] = []
+getSuggestionsGreedy rs = getSuggestionsWithMap payerMap receiverMap where
+    payerMap = getPayerMap $ getBalanceMap rs
+    receiverMap = getReceiverMap $ getBalanceMap rs
+
+getSuggestionsWithMap :: [(String, Int)] -> [(String, Int)] -> [MD.SplitSuggestion]
+getSuggestionsWithMap payerMap, receiverMap = 
+    if condition1 maxPayerTuple, maxPayerTuple 
+        then mywhile (next_version_of x)
+    else if condition2
+        then 
+    else final_version_of x
+    where 
+        -- (\(k1, v1) (k2, v2) -> v2 `compare` v1)
+        maxPayerTuple = List.maximumBy (comparing snd) $ HashMap.toList payerMap  
+        maxReciverTuple = List.minimumBy (comparing snd) $ HashMap.toList receiverMap   
+        condition1 payerMap, receiverMap = ((null payerMap) || (null receiverMap))
 
 -- auto_drive :: Int -> Int
 -- auto_drive speed = mywhile (90,speed)
@@ -43,6 +89,25 @@ import Data.List
 
 -- final_version_of (speed_limit,speed) = speed
 
+
+    -- def getSuggestionsGreedy:
+        -- payer_list = get_payer_list(balance_map)
+        -- receive_list = get_receive_list(balance_map)
+        -- suggestions = []
+
+        -- while payer_list:
+        --     max_payer = payer_list.pop((payer_list.index(max(payer_list))))
+        --     max_receiver = receive_list.pop((receive_list.index(min(receive_list))))
+
+        --     if max_payer[1] > -max_receiver[1]:
+        --         max_payer[1] = max_payer[1] - (-max_receiver[1])
+        --         payer_list.append(max_payer)
+        --     else if max_payer[1] < -max_receiver[1]:
+        --         max_receiver[1] = max_receiver[1] + max_payer[1]
+        --         receive_list.append(max_receiver)
+
+        --     suggestions.append([payer[0], receiver[0], min(max_payer[1], -max_receiver[1])])
+        -- return suggestions
 
 
 --  exact algorithm O(2^n * n^2)
