@@ -151,7 +151,7 @@ startAddingExpense = do
         dat = fromMaybe defaultDat (parseDay $ trim s2)
         amount = truncate' (fromMaybe 0 (readMaybe s3)) 2
         creditor = trim s4
-        debtors = splitOn "," (trim s5)
+        debtors = map trim (splitOn "," (trim s5))
 
     let expense =  MD.ExpenseRecord {
         MD.billingID = 1,
