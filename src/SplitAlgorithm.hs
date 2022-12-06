@@ -3,15 +3,15 @@ module SplitAlgorithm where
 import qualified Model.Data as MD
 import qualified View.State as VS
 import qualified Data.Map.Strict as HashMap
+import qualified View.AddExpense as AE
 import Data.List as List
 import Data.Ord
-
 -- get the balance map
 
 getTheInfoFromRecordToList :: MD.ExpenseRecord -> [(String, String, Float)]
 getTheInfoFromRecordToList (MD.ExpenseRecord billingID title description creditor debtors amount createDate) = map combi debtors where
     combi :: String -> (String, String, Float)
-    combi x = (creditor, x, amount)
+    combi x = (creditor, x, AE.truncate' (amount/(fromIntegral (length debtors))) 2)
 
 addOneInHashmap :: String -> HashMap.Map String Float -> Float -> HashMap.Map String Float
 addOneInHashmap s oldMap amount = newMap
@@ -32,7 +32,7 @@ getBalanceMapFromTupleList (t:ts) = updateMap t (getBalanceMapFromTupleList ts)
 
 getBalanceMap :: [MD.ExpenseRecord] -> HashMap.Map String Float
 getBalanceMap [] = HashMap.empty
-getBalanceMap er = HashMap.filter (\x -> x/=0) (getBalanceMapFromTupleList tupleList)
+getBalanceMap er = HashMap.filter (\x -> x>0.1) (getBalanceMapFromTupleList tupleList)
     where tupleList = concat $ map getTheInfoFromRecordToList er 
 
 -- def getBalanceMap: 
@@ -78,7 +78,7 @@ getSuggestionsWithMap balanceMap =
             getSuggestion mp mr = MD.SplitSuggestion {
             MD.debtor = fst mp,
             MD.suggestCreditor = fst mr,
-            MD.suggestAmount = min (snd mp) (abs (snd mr))
+            MD.suggestAmount = AE.truncate' (min (snd mp) (abs (snd mr))) 2
             }
 
 updateBalance :: HashMap.Map String Float -> (String, Float) -> (String, Float) -> HashMap.Map String Float
@@ -89,9 +89,9 @@ updateBalance balanceMap maxPayerTuple maxReciverTuple =
         then HashMap.delete (fst maxPayerTuple) (HashMap.insertWith (+) (fst maxReciverTuple) (snd maxPayerTuple) balanceMap)
     else
         HashMap.delete (fst maxPayerTuple) (HashMap.delete (fst maxReciverTuple) balanceMap)
-    where 
-        condition1 mp mr = (snd mp) > (0 - (snd mr))
-        condition2 mp mr = (snd mp) < (0 - (snd mr))  
+    where
+        condition1 mp mr = (snd mp) > (abs (snd mr))
+        condition2 mp mr = (snd mp) < (abs (snd mr)) 
 
     -- def getSuggestionsGreedy:
         -- payer_list = get_payer_list(balance_map)
