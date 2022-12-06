@@ -138,8 +138,8 @@ initialState =
        (E.editor Edit5 (Just 1) "")
 
 
-startFilter :: IO (VS.AppState)
-startFilter = do 
+startAddingExpense :: IO (VS.AppState)
+startAddingExpense = do 
     st <- liftIO $ M.defaultMain theVFApp initialState
     today <- liftIO $ utctDay <$> getCurrentTime
     let defaultDat = fromMaybe today (parseDay "2010-1-1")
