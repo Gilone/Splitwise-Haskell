@@ -46,34 +46,51 @@ getBalanceMap er = HashMap.filter (\x -> x/=0) (getBalanceMapFromTupleList tuple
 --             for P, amount in balances.items()
 --             if amount != 0}
 
--- heuristic algorithm (O(n))
+-- ******************************************* heuristic algorithm (O(n)) *******************************************
 
-getPayerMap :: HashMap.Map String Int -> HashMap.Map String Int
-getPayerMap HashMap.empty = []
-getPayerMap mp = HashMap.filter (\x -> x>0) mp
+-- getPayerMap :: HashMap.Map String Int -> HashMap.Map String Int
+-- getPayerMap HashMap.empty = []
+-- getPayerMap mp = HashMap.filter (\x -> x>0) mp
 
-getReceiverMap :: HashMap.Map String Int -> HashMap.Map String Int
-getReceiverMap HashMap.empty = []
-getReceiverMap mp = HashMap.filter (\x -> x<0) mp
+-- getReceiverMap :: HashMap.Map String Int -> HashMap.Map String Int
+-- getReceiverMap HashMap.empty = []
+-- getReceiverMap mp = HashMap.filter (\x -> x<0) mp
 
 getSuggestionsGreedy :: [MD.ExpenseRecord] -> [MD.SplitSuggestion]
 getSuggestionsGreedy [] = []
-getSuggestionsGreedy rs = getSuggestionsWithMap payerMap receiverMap where
-    payerMap = getPayerMap $ getBalanceMap rs
-    receiverMap = getReceiverMap $ getBalanceMap rs
+getSuggestionsGreedy rs = getSuggestionsWithMap $ getBalanceMap rs 
+-- where
+    -- payerMap = getPayerMap $ getBalanceMap rs
+    -- receiverMap = getReceiverMap $ getBalanceMap rs
 
-getSuggestionsWithMap :: [(String, Int)] -> [(String, Int)] -> [MD.SplitSuggestion]
-getSuggestionsWithMap payerMap, receiverMap = 
-    if condition1 maxPayerTuple, maxPayerTuple 
-        then mywhile (next_version_of x)
-    else if condition2
-        then 
-    else final_version_of x
+getSuggestionsWithMap :: HashMap.Map String Float -> [MD.SplitSuggestion]
+getSuggestionsWithMap balanceMap = 
+    if null balanceMap:
+        then []
+    else:
+        (getSuggestion maxPayerTuple maxReciverTuple) : (getSuggestionsWithMap (updateBalance balanceMap maxPayerTuple maxReciverTuple))
+        where
+            -- (\(k1, v1) (k2, v2) -> v2 `compare` v1)
+            maxPayerTuple = List.maximumBy (comparing snd) (HashMap.toList balanceMap)
+            maxReciverTuple = List.minimumBy (comparing snd) (HashMap.toList balanceMap)
+            getSuggestion mp, mr = MD.SplitSuggestion {
+            MD.debtor = fst mp,
+            MD.suggestCreditor = fst mr,
+            MD.suggestAmount = min (snd mp) (abs (snd mr))
+            }
+
+updateBalance :: HashMap.Map String Float -> (String Float) -> (String Float) -> HashMap.Map String Float
+updateBalance balanceMap maxPayerTuple maxReciverTuple = 
+    if condition1 maxPayerTuple maxReciverTuple
+        then HashMap.delete (fst maxReciverTuple) (HashMap.insertWith (+) (fst maxPayerTuple) (snd maxReciverTuple) balanceMap)
+    else if condition2 maxPayerTuple, maxReciverTuple
+        then HashMap.delete (fst maxPayerTuple) (HashMap.insertWith (+) (fst maxReciverTuple) (snd maxPayerTuple) balanceMap)
+    else:
+        HashMap.delete (fst maxPayerTuple) (HashMap.delete (fst maxReciverTuple) balanceMap)
     where 
-        -- (\(k1, v1) (k2, v2) -> v2 `compare` v1)
-        maxPayerTuple = List.maximumBy (comparing snd) $ HashMap.toList payerMap  
-        maxReciverTuple = List.minimumBy (comparing snd) $ HashMap.toList receiverMap   
-        condition1 payerMap, receiverMap = ((null payerMap) || (null receiverMap))
+        condition1 mp, mr = (snd mp) > (0 - (snd mr))
+        condition2 mp, mr = (snd mp) < (0 - (snd mr))  
+    
 
 -- auto_drive :: Int -> Int
 -- auto_drive speed = mywhile (90,speed)
@@ -110,7 +127,7 @@ getSuggestionsWithMap payerMap, receiverMap =
         -- return suggestions
 
 
---  exact algorithm O(2^n * n^2)
+--  ******************************************* exact algorithm O(2^n * n^2) *******************************************
 
 -- getSuggestionsDFS :: [MD.ExpenseRecord] -> [MD.SplitSuggestion]
 

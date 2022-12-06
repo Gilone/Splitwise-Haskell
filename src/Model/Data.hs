@@ -20,5 +20,7 @@ data ExpenseRecord = ExpenseRecord {
 
 data SplitSuggestion = SplitSuggestion {
     debtor :: String,
-    paymentSuggestions :: [(String, Float)]
+    suggestCreditor :: String,
+    suggestAmount :: Float
+    -- paymentSuggestions :: [(String, Float)]
 } deriving (Show, Eq, Generic)
