@@ -99,9 +99,6 @@ theMap = A.attrMap V.defAttr
 appCursor :: St -> [T.CursorLocation Name] -> Maybe (T.CursorLocation Name)
 appCursor = F.focusRingCursor (^.focusRing)
 
-
-
-
 ----------------------------- helper functions -----------------------------
 
 trim :: String -> String
