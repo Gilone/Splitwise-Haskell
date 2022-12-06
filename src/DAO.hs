@@ -67,7 +67,7 @@ loadMockData = do
         MD.title = "KFC",
         MD.description = Just "payment for KFC",
         MD.creditor = "JasonKing",
-        MD.debtors = ["JasonKing", "HAO", "Bill", "Joey"],
+        MD.debtors = ["JasonKing", "Hao", "Bill", "Joey"],
         MD.amount = 93.03,
         MD.createDate = date
     }
@@ -75,8 +75,8 @@ loadMockData = do
         MD.billingID = 2,
         MD.title = "Uber",
         MD.description = Just "Uber fare",
-        MD.creditor = "HAO",
-        MD.debtors = ["HAO", "Bill", "Joey"],
+        MD.creditor = "Hao",
+        MD.debtors = ["Hao", "Bill", "Joey"],
         MD.amount = 36.07,
         MD.createDate = date
     }
