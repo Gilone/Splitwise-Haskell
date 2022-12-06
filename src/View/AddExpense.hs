@@ -38,6 +38,7 @@ data Name = Edit1
           | Edit3
           | Edit4
           | Edit5
+          | Edit6
           deriving (Ord, Show, Eq)
 
 data St =
@@ -47,6 +48,7 @@ data St =
        , _edit3 :: E.Editor String Name
        , _edit4 :: E.Editor String Name
        , _edit5 :: E.Editor String Name
+       , _edit6 :: E.Editor String Name
        }
 
 makeLenses ''St
@@ -60,6 +62,7 @@ drawUI st = [ui]
         e3 = F.withFocusRing (st^.focusRing) (E.renderEditor (str . unlines)) (st^.edit3)
         e4 = F.withFocusRing (st^.focusRing) (E.renderEditor (str . unlines)) (st^.edit4)
         e5 = F.withFocusRing (st^.focusRing) (E.renderEditor (str . unlines)) (st^.edit5)
+        e6 = F.withFocusRing (st^.focusRing) (E.renderEditor (str . unlines)) (st^.edit6)
         ui = C.center $
             (str "Title:                      " <+> (hLimit 30 $ vLimit 5 e1)) <=>
             str " " <=>
@@ -70,6 +73,8 @@ drawUI st = [ui]
             (str "Creditor:                   " <+> (hLimit 30 $ vLimit 5 e4)) <=>
             str " " <=>
             (str "Debtors (use ',' to split): " <+> (hLimit 30 $ vLimit 5 e5)) <=>
+            str " " <=>
+            (str "Description (Optional):     " <+> (hLimit 30 $ vLimit 5 e6)) <=>
             str " " <=>
             str "Press Tab to switch between editors, Esc to confirm."
 
@@ -86,6 +91,7 @@ appEvent st (T.VtyEvent ev) =
                Just Edit3 -> T.handleEventLensed st edit3 E.handleEditorEvent ev
                Just Edit4 -> T.handleEventLensed st edit4 E.handleEditorEvent ev
                Just Edit5 -> T.handleEventLensed st edit5 E.handleEditorEvent ev
+               Just Edit6 -> T.handleEventLensed st edit6 E.handleEditorEvent ev
                Nothing -> return st
 appEvent st _ = M.continue st
 
@@ -128,35 +134,37 @@ theVFApp =
 
 initialState :: St
 initialState =
-    St (F.focusRing [Edit1, Edit2, Edit3, Edit4, Edit5])
+    St (F.focusRing [Edit1, Edit2, Edit3, Edit4, Edit5, Edit6])
        (E.editor Edit1 (Just 1) "")
        (E.editor Edit2 (Just 1) "")
        (E.editor Edit3 (Just 1) "")
        (E.editor Edit4 (Just 1) "")
        (E.editor Edit5 (Just 1) "")
+       (E.editor Edit6 (Just 1) "Split Eqaully")
 
 
 startAddingExpense :: IO (VS.AppState)
 startAddingExpense = do 
     st <- liftIO $ M.defaultMain theVFApp initialState
     today <- liftIO $ utctDay <$> getCurrentTime
-    let defaultDat = fromMaybe today (parseDay "2022-1-1")
     let
         s1 = unlines $ E.getEditContents $ st^.edit1
         s2 = unlines $ E.getEditContents $ st^.edit2
         s3 = unlines $ E.getEditContents $ st^.edit3
         s4 = unlines $ E.getEditContents $ st^.edit4
         s5 = unlines $ E.getEditContents $ st^.edit5
+        s6 = unlines $ E.getEditContents $ st^.edit6
         title = trim' s1
-        dat = fromMaybe defaultDat (parseDay $ trim' s2)
+        dat = fromMaybe today (parseDay $ trim' s2)
         amount = truncate' (fromMaybe 0 (readMaybe s3)) 2
         creditor = trim' s4
         debtors = map trim' (splitOn "," (trim' s5))
+        desc = trim' s6
 
     let expense =  MD.ExpenseRecord {
         MD.billingID = 1,
         MD.title = title,
-        MD.description = Just "aa",
+        MD.description = if desc == "" then Nothing else Just desc,
         MD.creditor = creditor,
         MD.debtors = debtors,
         MD.amount = amount,
