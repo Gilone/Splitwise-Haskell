@@ -31,6 +31,8 @@ import qualified Brick.AttrMap as A
 
 import qualified Model.Data as MD
 import qualified View.State as VS
+import qualified View.Settlement as VT
+
 import qualified Data.Text as DT
 import qualified Brick.Main as M
 
@@ -65,8 +67,9 @@ dashboardEvent s@(VS.AppState l _ _ m) (T.VtyEvent e) =
             M.halt newState
 
         V.EvKey (V.KChar 's') [] -> do
-            newState <- liftIO $ VS.getEmptyAppState False 2
-            M.halt newState
+            state <- liftIO $ VS.getAppState l False 2 m
+            M.suspendAndResume $ M.defaultMain VT.theApp state
+
 
         V.EvKey (V.KChar 'd')  [] -> 
             case l^.L.listSelectedL of
