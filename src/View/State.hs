@@ -15,7 +15,7 @@ data AppState = AppState {
 
 getAppState :: (L.List () MD.ExpenseRecord)-> Bool ->Int->Bool -> IO (AppState)
 getAppState l s p m = do
-    _ <- DAO.loadMockData
+    -- _ <- DAO.loadMockData
     ers <- DAO.batchQuery True
     return $  AppState (L.list () (Vec.fromList ers) 1) False 0 True
 
