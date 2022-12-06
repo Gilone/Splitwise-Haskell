@@ -5,7 +5,6 @@ module View.AddExpense where
 
 import Lens.Micro
 import Lens.Micro.TH
--- import Lens.Micro ((^.))
 import Data.Time (Day)
 import Data.Char (isSpace)
 import Data.Time.Clock (getCurrentTime, utctDay)
@@ -29,7 +28,6 @@ import qualified Brick.AttrMap as A
 import qualified Brick.Focus as F
 import Brick.Util (on)
 
--- import qualified View.Trending as VT
 import qualified View.State as VS
 import qualified Model.Data as MD
 import DAO (addExpense)
@@ -117,6 +115,9 @@ truncate' :: Float -> Int -> Float
 truncate' x n = (fromIntegral (round (x * t))) / t
     where t = 10^n
 
+isNotValid' :: MD.ExpenseRecord -> Bool
+isNotValid' (MD.ExpenseRecord billingID title description creditor debtors amount createDate) = (all isSpace title) || (all isSpace creditor) || (null debtors)
+
 ----------------------------- helper functions -----------------------------
 
 theVFApp :: M.App St e Name
@@ -142,14 +143,13 @@ startAddingExpense :: IO (VS.AppState)
 startAddingExpense = do 
     st <- liftIO $ M.defaultMain theVFApp initialState
     today <- liftIO $ utctDay <$> getCurrentTime
-    let defaultDat = fromMaybe today (parseDay "2010-1-1")
+    let defaultDat = fromMaybe today (parseDay "2022-1-1")
     let
         s1 = unlines $ E.getEditContents $ st^.edit1
         s2 = unlines $ E.getEditContents $ st^.edit2
         s3 = unlines $ E.getEditContents $ st^.edit3
         s4 = unlines $ E.getEditContents $ st^.edit4
         s5 = unlines $ E.getEditContents $ st^.edit5
-        -- lan = if all isSpace s1 then "*" else (trim s1)
         title = trim s1
         dat = fromMaybe defaultDat (parseDay $ trim s2)
         amount = truncate' (fromMaybe 0 (readMaybe s3)) 2
@@ -165,7 +165,9 @@ startAddingExpense = do
         MD.amount = amount,
         MD.createDate = dat
     }
-    addExpense True expense
+    if isNotValid' expense
+        then return()
+        else addExpense True expense
     
     state <- liftIO $ VS.getEmptyAppState False 0
     return state
