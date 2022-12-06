@@ -127,7 +127,7 @@ theApp =
           }
 
 
-startDashboard :: Bool -> IO VS.AppState
-startDashboard isMock = do
-    as <- VS.getInitAppState isMock
+startDashboard :: Bool -> Bool -> IO VS.AppState
+startDashboard isMock isFirstTime = do
+    as <- VS.getInitAppState isMock isFirstTime
     M.defaultMain theApp as

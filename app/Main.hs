@@ -10,10 +10,10 @@ import qualified Control.Monad
 loop :: IO ()
 loop= do
   q <- VE.startFilter
-  currentState <- VD.startDashboard True
+  currentState <- VD.startDashboard True False
   Control.Monad.unless (VS.shouldExit currentState) loop
 
 main :: IO ()
 main = do
-  currentState <- VD.startDashboard True
+  currentState <- VD.startDashboard True True
   Control.Monad.unless (VS.shouldExit currentState) loop

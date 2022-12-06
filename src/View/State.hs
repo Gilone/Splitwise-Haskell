@@ -13,13 +13,16 @@ data AppState = AppState {
     mockData :: Bool
 }
 
-getInitAppState :: Bool -> IO (AppState)
-getInitAppState isMock
+getInitAppState :: Bool -> Bool -> IO (AppState)
+getInitAppState isMock isFirstTime
     | isMock == False = do
         ers <- DAO.batchQuery False
         return $  AppState  (L.list () (Vec.fromList ers) 1) False 0 isMock
-    | otherwise = do
+    | isFirstTime == True = do
         _ <- DAO.loadMockData
+        ers <- DAO.batchQuery True
+        return $  AppState  (L.list () (Vec.fromList ers) 1) False 0 isMock
+    | otherwise = do 
         ers <- DAO.batchQuery True
         return $  AppState  (L.list () (Vec.fromList ers) 1) False 0 isMock
 

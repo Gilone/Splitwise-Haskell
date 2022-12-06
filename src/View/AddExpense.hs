@@ -9,6 +9,7 @@ import Lens.Micro.TH
 import Data.Time (Day)
 import Data.Char (isSpace)
 import Data.Time.Clock (getCurrentTime, utctDay)
+import Data.List.Split (splitOn)
 import Control.Monad.RWS.Lazy (MonadIO(liftIO))
 import Control.Monad (void)
 import qualified Graphics.Vty as V
@@ -31,6 +32,7 @@ import Brick.Util (on)
 -- import qualified View.Trending as VT
 import qualified View.State as VS
 import qualified Model.Data as MD
+import DAO (addExpense)
 import Data.Maybe ( fromMaybe )
 import Text.Read (readMaybe)
 data Name = Edit1
@@ -144,10 +146,22 @@ startFilter = do
         s4 = unlines $ E.getEditContents $ st^.edit4
         s5 = unlines $ E.getEditContents $ st^.edit5
         -- lan = if all isSpace s1 then "*" else (trim s1)
+        title = trim s1
         dat = fromMaybe defaultDat (parseDay $ trim s2)
-        -- pag' = fromMaybe 1 (readMaybe s3)
-        -- per' = fromMaybe 10 (readMaybe s4)
-        -- pag = if pag'<0 || pag'>50 then 1 else pag'
-        -- per = if per'<0 || per'>100 then 10 else per'
+        amount = fromMaybe 0 (readMaybe s3)
+        creditor = trim s4
+        debtors = splitOn "," (trim s5)
+
+    let expense =  MD.ExpenseRecord {
+        MD.billingID = 1,
+        MD.title = title,
+        MD.description = Just "aa",
+        MD.creditor = creditor,
+        MD.debtors = debtors,
+        MD.amount = amount,
+        MD.createDate = dat
+    }
+    addExpense True expense
+    
     state <- liftIO $ VS.getEmptyAppState False 0
     return state
