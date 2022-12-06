@@ -31,18 +31,24 @@ import qualified Brick.AttrMap as A
 
 import qualified Model.Data as MD
 import qualified View.State as VS
+import qualified SplitAlgorithm as SS
 import qualified Data.Text as DT
 import qualified Brick.Main as M
 
 drawSettlement :: VS.AppState -> [Widget ()]
 drawSettlement (VS.AppState l _ _ _) = [ui]
     where
+        
+        ll = Vec.toList (l^.L.listElementsL)
+        ers = SS.getSuggestionsGreedy ll
+        er = L.list () (Vec.fromList ers) 1
+        -- ers = DAO.batchQuery True
         label = str "show settlement"
         box1 = WB.borderWithLabel label $
               hLimit 205 $
               vLimit 50 $
-              drawTable l
-        ui = C.hCenter $ vBox [ box1, str "exit" ]
+              drawTable er
+        ui = C.hCenter $ vBox [ box1, str "Press \"Esc\" to exit" ]
 
 
 settlementEvent :: VS.AppState -> T.BrickEvent () e -> T.EventM () (T.Next VS.AppState)
@@ -61,17 +67,17 @@ handleTrendingList e s@(VS.AppState theList f p m) = do
     return $ VS.AppState nextList f p m
 
 
-drawTable :: (L.List () MD.ExpenseRecord) -> Widget ()
+drawTable :: (L.List () MD.SplitSuggestion) -> Widget ()
 drawTable l = renderTable $  innerTable (Vec.toList (l^.L.listElementsL))
 
-innerTable :: [MD.ExpenseRecord] -> Table ()
+innerTable :: [MD.SplitSuggestion] -> Table ()
 innerTable rs = 
     surroundingBorder False $ 
-    table $  [txt "Amount", txt "Creditor", txt "Debtors"] : map expenseToTable rs
+    table $  [txt "suggestAmount", txt "suggestCreditor", txt "Debtor"] : map expenseToTable rs
 
-expenseToTable :: MD.ExpenseRecord -> [Widget ()]
-expenseToTable (MD.ExpenseRecord billingID title description creditor debtors amount createDate) = 
-    [ txt(DT.pack (show amount)), txt (DT.pack (show creditor)), txt (DT.pack (show debtors))]   
+expenseToTable :: MD.SplitSuggestion -> [Widget ()]
+expenseToTable (MD.SplitSuggestion debtor suggestCreditor suggestAmount) = 
+    [ txt(DT.pack (show suggestAmount)), txt (DT.pack (show suggestCreditor)), txt (DT.pack (show debtor))]   
 
 
 customAttr :: A.AttrName
