@@ -4,6 +4,7 @@ import Test.Tasty
 import Test.Tasty.HUnit
 import Data.List.Split
 import DAOTest (daoTest)
+import AddExpenseTest (addExpenseTest)
 import qualified Model.Lib as LB (version)
 
 
@@ -15,7 +16,7 @@ libTest :: TestTree
 libTest = testGroup "Lib Test" [versionTest]
 
 tests :: TestTree
-tests = testGroup "Client Tests" [libTest, daoTest]
+tests = testGroup "Client Tests" [libTest, daoTest, addExpenseTest]
 
 main :: IO ()
 main = defaultMain tests

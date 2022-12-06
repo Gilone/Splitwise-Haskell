@@ -101,8 +101,8 @@ appCursor = F.focusRingCursor (^.focusRing)
 
 ----------------------------- helper functions -----------------------------
 
-trim :: String -> String
-trim = f . f
+trim' :: String -> String
+trim' = f . f
    where f = reverse . dropWhile isSpace
 
 parseDay :: String -> Maybe Day
@@ -147,11 +147,11 @@ startAddingExpense = do
         s3 = unlines $ E.getEditContents $ st^.edit3
         s4 = unlines $ E.getEditContents $ st^.edit4
         s5 = unlines $ E.getEditContents $ st^.edit5
-        title = trim s1
-        dat = fromMaybe defaultDat (parseDay $ trim s2)
+        title = trim' s1
+        dat = fromMaybe defaultDat (parseDay $ trim' s2)
         amount = truncate' (fromMaybe 0 (readMaybe s3)) 2
-        creditor = trim s4
-        debtors = map trim (splitOn "," (trim s5))
+        creditor = trim' s4
+        debtors = map trim' (splitOn "," (trim' s5))
 
     let expense =  MD.ExpenseRecord {
         MD.billingID = 1,

@@ -80,6 +80,7 @@ test-suite splitWise-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      AddExpenseTest
       DAOTest
       Paths_splitWise
   hs-source-dirs:
