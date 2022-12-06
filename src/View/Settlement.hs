@@ -43,7 +43,7 @@ drawSettlement (VS.AppState l _ _ _) = [ui]
         ers = SS.getSuggestionsGreedy ll
         er = L.list () (Vec.fromList ers) 1
         -- ers = DAO.batchQuery True
-        label = str "show settlement"
+        label = str "Show Settlement Suggestions"
         box1 = WB.borderWithLabel label $
               hLimit 205 $
               vLimit 50 $
@@ -73,7 +73,7 @@ drawTable l = renderTable $  innerTable (Vec.toList (l^.L.listElementsL))
 innerTable :: [MD.SplitSuggestion] -> Table ()
 innerTable rs = 
     surroundingBorder False $ 
-    table $  [txt "suggestAmount", txt "suggestCreditor", txt "Debtor"] : map expenseToTable rs
+    table $  [txt "Suggest Amount", txt "Suggest Creditor", txt "Debtor"] : map expenseToTable rs
 
 expenseToTable :: MD.SplitSuggestion -> [Widget ()]
 expenseToTable (MD.SplitSuggestion debtor suggestCreditor suggestAmount) = 
