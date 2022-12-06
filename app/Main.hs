@@ -9,7 +9,7 @@ import qualified Control.Monad
 
 loop :: IO ()
 loop= do
-  q <- VE.startAddingExpense
+  q <- VE.startFilter
   currentState <- VD.startDashboard True False
   Control.Monad.unless (VS.shouldExit currentState) loop
 

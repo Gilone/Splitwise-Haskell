@@ -3,8 +3,8 @@ module SplitAlgorithm where
 import qualified Model.Data as MD
 import qualified View.State as VS
 import qualified Data.Map.Strict as HashMap
-import Data.List
-
+import Data.List as List
+import Data.Ord
 
 -- get the balance map
 
@@ -13,23 +13,25 @@ getTheInfoFromRecordToList (MD.ExpenseRecord billingID title description credito
     combi :: String -> (String, String, Float)
     combi x = (creditor, x, amount)
 
-addOneInHashmap :: String -> HashMap.Map String Int -> Float -> HashMap.Map String Int
+addOneInHashmap :: String -> HashMap.Map String Float -> Float -> HashMap.Map String Float
 addOneInHashmap s oldMap amount = newMap
    where newMap = HashMap.insertWith (+) s amount oldMap
 
-minisOneInHashmap :: String -> HashMap.Map String Int -> Float -> HashMap.Map String Int
+minisOneInHashmap :: String -> HashMap.Map String Float -> Float -> HashMap.Map String Float
 minisOneInHashmap s oldMap amount = newMap
    where newMap = HashMap.insertWith (+) s (0 - amount) oldMap
 
 getBalanceMapFromTupleList :: [(String, String, Float)] -> HashMap.Map String Float
 getBalanceMapFromTupleList [] = HashMap.empty
-getBalanceMapFromTupleList (t:ts) = updateMap t (getBalanceMapFromTupleList ts) where
-    updateMap tu, mp = minisOneInHashmap (get1 tu) (minisOneInHashmap (get2 tu) mp)
-    get1 (a,_,_) = a
-    get2 (_,b,_) = b
+getBalanceMapFromTupleList (t:ts) = updateMap t (getBalanceMapFromTupleList ts) 
+    where
+        updateMap tu mp = minisOneInHashmap (get1 tu) (addOneInHashmap (get2 tu) mp (get3 tu)) (get3 tu)
+        get1 (a,_,_) = a
+        get2 (_,b,_) = b
+        get3 (_,_,c) = c
 
 getBalanceMap :: [MD.ExpenseRecord] -> HashMap.Map String Float
-getBalanceMap [] = []
+getBalanceMap [] = HashMap.empty
 getBalanceMap er = HashMap.filter (\x -> x/=0) (getBalanceMapFromTupleList tupleList)
     where tupleList = concat $ map getTheInfoFromRecordToList er 
 
@@ -65,31 +67,31 @@ getSuggestionsGreedy rs = getSuggestionsWithMap $ getBalanceMap rs
 
 getSuggestionsWithMap :: HashMap.Map String Float -> [MD.SplitSuggestion]
 getSuggestionsWithMap balanceMap = 
-    if null balanceMap:
+    if null balanceMap
         then []
-    else:
+    else
         (getSuggestion maxPayerTuple maxReciverTuple) : (getSuggestionsWithMap (updateBalance balanceMap maxPayerTuple maxReciverTuple))
         where
             -- (\(k1, v1) (k2, v2) -> v2 `compare` v1)
             maxPayerTuple = List.maximumBy (comparing snd) (HashMap.toList balanceMap)
             maxReciverTuple = List.minimumBy (comparing snd) (HashMap.toList balanceMap)
-            getSuggestion mp, mr = MD.SplitSuggestion {
+            getSuggestion mp mr = MD.SplitSuggestion {
             MD.debtor = fst mp,
             MD.suggestCreditor = fst mr,
             MD.suggestAmount = min (snd mp) (abs (snd mr))
             }
 
-updateBalance :: HashMap.Map String Float -> (String Float) -> (String Float) -> HashMap.Map String Float
+updateBalance :: HashMap.Map String Float -> (String, Float) -> (String, Float) -> HashMap.Map String Float
 updateBalance balanceMap maxPayerTuple maxReciverTuple = 
     if condition1 maxPayerTuple maxReciverTuple
         then HashMap.delete (fst maxReciverTuple) (HashMap.insertWith (+) (fst maxPayerTuple) (snd maxReciverTuple) balanceMap)
-    else if condition2 maxPayerTuple, maxReciverTuple
+    else if condition2 maxPayerTuple maxReciverTuple
         then HashMap.delete (fst maxPayerTuple) (HashMap.insertWith (+) (fst maxReciverTuple) (snd maxPayerTuple) balanceMap)
-    else:
+    else
         HashMap.delete (fst maxPayerTuple) (HashMap.delete (fst maxReciverTuple) balanceMap)
     where 
-        condition1 mp, mr = (snd mp) > (0 - (snd mr))
-        condition2 mp, mr = (snd mp) < (0 - (snd mr))  
+        condition1 mp mr = (snd mp) > (0 - (snd mr))
+        condition2 mp mr = (snd mp) < (0 - (snd mr))  
 
     -- def getSuggestionsGreedy:
         -- payer_list = get_payer_list(balance_map)
