@@ -32,7 +32,7 @@ getBalanceMapFromTupleList (t:ts) = updateMap t (getBalanceMapFromTupleList ts)
 
 getBalanceMap :: [MD.ExpenseRecord] -> HashMap.Map String Float
 getBalanceMap [] = HashMap.empty
-getBalanceMap er = HashMap.filter (\x -> x>0.1) (getBalanceMapFromTupleList tupleList)
+getBalanceMap er = HashMap.filter (\x -> (abs x) > 0.1) (getBalanceMapFromTupleList tupleList)
     where tupleList = concat $ map getTheInfoFromRecordToList er 
 
 -- def getBalanceMap: 
@@ -60,29 +60,32 @@ getBalanceMap er = HashMap.filter (\x -> x>0.1) (getBalanceMapFromTupleList tupl
 
 getSuggestionsGreedy :: [MD.ExpenseRecord] -> [MD.SplitSuggestion]
 getSuggestionsGreedy [] = []
-getSuggestionsGreedy rs = getSuggestionsWithMap $ getBalanceMap rs 
--- where
-    -- payerMap = getPayerMap $ getBalanceMap rs
-    -- receiverMap = getReceiverMap $ getBalanceMap rs
+getSuggestionsGreedy rs = 
+    if (HashMap.size balanceMap == 1) then error "\n [ERROR] Balance map should not have only 1 item \n"
+    else
+        getSuggestionsWithMap balanceMap
+    where
+        balanceMap = getBalanceMap rs
 
 getSuggestionsWithMap :: HashMap.Map String Float -> [MD.SplitSuggestion]
 getSuggestionsWithMap balanceMap = 
     if null balanceMap
         then []
     else
-        (getSuggestion maxPayerTuple maxReciverTuple) : (getSuggestionsWithMap (updateBalance balanceMap maxPayerTuple maxReciverTuple))
+        (getSuggestion maxPayerTuple maxReciverTuple) : (getSuggestionsWithMap (updateBalance balanceMap))
         where
             -- (\(k1, v1) (k2, v2) -> v2 `compare` v1)
             maxPayerTuple = List.maximumBy (comparing snd) (HashMap.toList balanceMap)
             maxReciverTuple = List.minimumBy (comparing snd) (HashMap.toList balanceMap)
-            getSuggestion mp mr = MD.SplitSuggestion {
+            getSuggestion mp mr = 
+                MD.SplitSuggestion {
             MD.debtor = fst mp,
             MD.suggestCreditor = fst mr,
             MD.suggestAmount = AE.truncate' (min (snd mp) (abs (snd mr))) 2
             }
 
-updateBalance :: HashMap.Map String Float -> (String, Float) -> (String, Float) -> HashMap.Map String Float
-updateBalance balanceMap maxPayerTuple maxReciverTuple = 
+updateBalance :: HashMap.Map String Float -> HashMap.Map String Float
+updateBalance balanceMap = 
     if condition1 maxPayerTuple maxReciverTuple
         then HashMap.delete (fst maxReciverTuple) (HashMap.insertWith (+) (fst maxPayerTuple) (snd maxReciverTuple) balanceMap)
     else if condition2 maxPayerTuple maxReciverTuple
@@ -90,8 +93,13 @@ updateBalance balanceMap maxPayerTuple maxReciverTuple =
     else
         HashMap.delete (fst maxPayerTuple) (HashMap.delete (fst maxReciverTuple) balanceMap)
     where
+        maxPayerTuple = List.maximumBy (comparing snd) (HashMap.toList balanceMap)
+        maxReciverTuple = List.minimumBy (comparing snd) (HashMap.toList balanceMap)
         condition1 mp mr = (snd mp) > (abs (snd mr))
         condition2 mp mr = (snd mp) < (abs (snd mr)) 
+
+                -- if (HashMap.size balanceMap == 1) then error "no"
+                -- else
 
     -- def getSuggestionsGreedy:
         -- payer_list = get_payer_list(balance_map)
