@@ -90,152 +90,152 @@ loadMockData = do
     --     MD.createDate = date
     -- }
 
-    -- let record1 = MD.ExpenseRecord {
-    --     MD.billingID = 1,
-    --     MD.title = "KFC",
-    --     MD.description = Just "payment for KFC",
-    --     MD.creditor = "Fred",
-    --     MD.debtors = ["Bob", "David", "Ema"],
-    --     MD.amount = 30,
-    --     MD.createDate = date
-    -- }
-    -- let record2 = MD.ExpenseRecord {
-    --     MD.billingID = 2,
-    --     MD.title = "Uber",
-    --     MD.description = Just "payment for Uber drive",
-    --     MD.creditor = "Fred",
-    --     MD.debtors = ["Charile"],
-    --     MD.amount = 30,
-    --     MD.createDate = date
-    -- }
-    -- let record3 = MD.ExpenseRecord {
-    --     MD.billingID = 3,
-    --     MD.title = "Lego",
-    --     MD.description = Just "payment for Lego",
-    --     MD.creditor = "Gabe",
-    --     MD.debtors = ["Bob"],
-    --     MD.amount = 30,
-    --     MD.createDate = date
-    -- }
-    -- let record4 = MD.ExpenseRecord {
-    --     MD.billingID = 4,
-    --     MD.title = "Lego2",
-    --     MD.description = Just "payment for Lego",
-    --     MD.creditor = "Gabe",
-    --     MD.debtors = ["David"],
-    --     MD.amount = 10,
-    --     MD.createDate = date
-    -- }
-    -- let record5 = MD.ExpenseRecord {
-    --     MD.billingID = 5,
-    --     MD.title = "lunch",
-    --     MD.description = Just "payment for lunch",
-    --     MD.creditor = "Bob",
-    --     MD.debtors = ["Charile"],
-    --     MD.amount = 40,
-    --     MD.createDate = date
-    -- }
-    -- let record6 = MD.ExpenseRecord {
-    --     MD.billingID = 6,
-    --     MD.title = "ticket",
-    --     MD.description = Just "payment for park ticket",
-    --     MD.creditor = "Charile",
-    --     MD.debtors = ["David"],
-    --     MD.amount = 20,
-    --     MD.createDate = date
-    -- }
-    -- let record7 = MD.ExpenseRecord {
-    --     MD.billingID = 7,
-    --     MD.title = "bread",
-    --     MD.description = Just "payment for 85C",
-    --     MD.creditor = "David",
-    --     MD.debtors = ["Ema"],
-    --     MD.amount = 50,
-    --     MD.createDate = date
-    -- }
-    -- let dropTable = "DROP TABLE IF EXISTS mock"
-    -- execDDL dropTable
-    -- addExpense True record1
-    -- addExpense True record2
-    -- addExpense True record3
-    -- addExpense True record4
-    -- addExpense True record5
-    -- addExpense True record6
-    -- addExpense True record7
-
-    -- debug
     let record1 = MD.ExpenseRecord {
         MD.billingID = 1,
         MD.title = "KFC",
-        MD.description = Just "Had dinner togeter at KFC after coming back from the park, the fried chicken was very juicy",
-        MD.creditor = "Bob",
-        MD.debtors = ["Alice", "Bob"],
-        MD.amount = 40,
+        MD.description = Just "payment for KFC",
+        MD.creditor = "Fred",
+        MD.debtors = ["Bob", "David", "Ema"],
+        MD.amount = 30,
         MD.createDate = date
     }
     let record2 = MD.ExpenseRecord {
         MD.billingID = 2,
-        MD.title = "Noodle House",
-        MD.description = Just "Payment for Noodle House",
-        MD.creditor = "Bob",
-        MD.debtors = ["Carol","Dave"],
-        MD.amount = 20,
+        MD.title = "Uber",
+        MD.description = Just "payment for Uber drive",
+        MD.creditor = "Fred",
+        MD.debtors = ["Charile"],
+        MD.amount = 30,
         MD.createDate = date
     }
-    -- let record3 = MD.ExpenseRecord {
-    --     MD.billingID = 3,
-    --     MD.title = "KFC",
-    --     MD.description = Just "payment for KFC",
-    --     MD.creditor = "Bob",
-    --     MD.debtors = ["Dave"],
-    --     MD.amount = 10,
-    --     MD.createDate = date
-    -- }
+    let record3 = MD.ExpenseRecord {
+        MD.billingID = 3,
+        MD.title = "Lego",
+        MD.description = Just "payment for Lego",
+        MD.creditor = "Gabe",
+        MD.debtors = ["Bob"],
+        MD.amount = 30,
+        MD.createDate = date
+    }
     let record4 = MD.ExpenseRecord {
         MD.billingID = 4,
-        MD.title = "Boba Milk Tea",
-        MD.description = Just "help advance payment",
-        MD.creditor = "Carol",
-        MD.debtors = ["Alice"],
-        MD.amount = 20,
+        MD.title = "Lego2",
+        MD.description = Just "payment for Lego",
+        MD.creditor = "Gabe",
+        MD.debtors = ["David"],
+        MD.amount = 10,
         MD.createDate = date
     }
     let record5 = MD.ExpenseRecord {
         MD.billingID = 5,
-        MD.title = "KFC",
-        MD.description = Just "KFC again",
-        MD.creditor = "Dave",
-        MD.debtors = ["Carol"],
-        MD.amount = 10,
+        MD.title = "lunch",
+        MD.description = Just "payment for lunch",
+        MD.creditor = "Bob",
+        MD.debtors = ["Charile"],
+        MD.amount = 40,
         MD.createDate = date
     }
     let record6 = MD.ExpenseRecord {
         MD.billingID = 6,
-        MD.title = "Beer",
-        MD.description = Just "payment for Beer",
-        MD.creditor = "Dave",
-        MD.debtors = ["Alice"],
+        MD.title = "ticket",
+        MD.description = Just "payment for park ticket",
+        MD.creditor = "Charile",
+        MD.debtors = ["David"],
         MD.amount = 20,
         MD.createDate = date
     }
     let record7 = MD.ExpenseRecord {
         MD.billingID = 7,
-        MD.title = "Tickets",
-        MD.description = Just "Tickets for Brutal Metal Band Tour at Brick by brick!",
-        MD.creditor = "Alice",
-        MD.debtors = ["Dave"],
-        MD.amount = 20,
+        MD.title = "bread",
+        MD.description = Just "payment for 85C",
+        MD.creditor = "David",
+        MD.debtors = ["Ema"],
+        MD.amount = 50,
         MD.createDate = date
     }
     let dropTable = "DROP TABLE IF EXISTS mock"
     execDDL dropTable
     addExpense True record1
     addExpense True record2
-    -- addExpense True record3
+    addExpense True record3
     addExpense True record4
     addExpense True record5
     addExpense True record6
     addExpense True record7
+
+    -- debug
+    -- let record1 = MD.ExpenseRecord {
+    --     MD.billingID = 1,
+    --     MD.title = "KFC",
+    --     MD.description = Just "Had dinner togeter at KFC after coming back from the park, the fried chicken was very juicy",
+    --     MD.creditor = "Bob",
+    --     MD.debtors = ["Alice", "Bob"],
+    --     MD.amount = 40,
+    --     MD.createDate = date
+    -- }
+    -- let record2 = MD.ExpenseRecord {
+    --     MD.billingID = 2,
+    --     MD.title = "Noodle House",
+    --     MD.description = Just "Payment for Noodle House",
+    --     MD.creditor = "Bob",
+    --     MD.debtors = ["Carol","Dave"],
+    --     MD.amount = 20,
+    --     MD.createDate = date
+    -- }
+    -- -- let record3 = MD.ExpenseRecord {
+    -- --     MD.billingID = 3,
+    -- --     MD.title = "KFC",
+    -- --     MD.description = Just "payment for KFC",
+    -- --     MD.creditor = "Bob",
+    -- --     MD.debtors = ["Dave"],
+    -- --     MD.amount = 10,
+    -- --     MD.createDate = date
+    -- -- }
+    -- let record4 = MD.ExpenseRecord {
+    --     MD.billingID = 4,
+    --     MD.title = "Boba Milk Tea",
+    --     MD.description = Just "help advance payment",
+    --     MD.creditor = "Carol",
+    --     MD.debtors = ["Alice"],
+    --     MD.amount = 20,
+    --     MD.createDate = date
+    -- }
+    -- let record5 = MD.ExpenseRecord {
+    --     MD.billingID = 5,
+    --     MD.title = "KFC",
+    --     MD.description = Just "KFC again",
+    --     MD.creditor = "Dave",
+    --     MD.debtors = ["Carol"],
+    --     MD.amount = 10,
+    --     MD.createDate = date
+    -- }
+    -- let record6 = MD.ExpenseRecord {
+    --     MD.billingID = 6,
+    --     MD.title = "Beer",
+    --     MD.description = Just "payment for Beer",
+    --     MD.creditor = "Dave",
+    --     MD.debtors = ["Alice"],
+    --     MD.amount = 20,
+    --     MD.createDate = date
+    -- }
+    -- let record7 = MD.ExpenseRecord {
+    --     MD.billingID = 7,
+    --     MD.title = "Tickets",
+    --     MD.description = Just "Tickets for Brutal Metal Band Tour at Brick by brick!",
+    --     MD.creditor = "Alice",
+    --     MD.debtors = ["Dave"],
+    --     MD.amount = 20,
+    --     MD.createDate = date
+    -- }
+    -- let dropTable = "DROP TABLE IF EXISTS mock"
+    -- execDDL dropTable
+    -- addExpense True record1
+    -- addExpense True record2
+    -- -- addExpense True record3
+    -- addExpense True record4
+    -- addExpense True record5
+    -- addExpense True record6
+    -- addExpense True record7
 
 -------------------------------------------------------------
 -- Below are private functions supposed not to be exported --
