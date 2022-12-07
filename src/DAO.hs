@@ -61,7 +61,11 @@ batchQuery isMock = do
 loadMockData :: IO ()
 loadMockData = do
     today <- utctDay <$> getCurrentTime
-    let date = fromMaybe today (parseDay "2022-11-11")
+    let date = fromMaybe today (parseDay "2022-11-20")
+    let date2 = fromMaybe today (parseDay "2022-12-05")
+    let date3 = fromMaybe today (parseDay "2022-12-06")
+    let date4 = fromMaybe today (parseDay "2022-11-25")
+
     -- let record1 = MD.ExpenseRecord {
     --     MD.billingID = 1,
     --     MD.title = "KFC",
@@ -92,8 +96,8 @@ loadMockData = do
 
     let record1 = MD.ExpenseRecord {
         MD.billingID = 1,
-        MD.title = "KFC",
-        MD.description = Just "payment for KFC",
+        MD.title = "Dinner at KFC",
+        MD.description = Just "Had dinner togeter at KFC, the fried chicken was very juicy",
         MD.creditor = "Fred",
         MD.debtors = ["Bob", "David", "Ema"],
         MD.amount = 30,
@@ -102,56 +106,56 @@ loadMockData = do
     let record2 = MD.ExpenseRecord {
         MD.billingID = 2,
         MD.title = "Uber",
-        MD.description = Just "payment for Uber drive",
+        MD.description = Just "payment for Uber drive, from La Jolla to Downtown",
         MD.creditor = "Fred",
         MD.debtors = ["Charile"],
         MD.amount = 30,
-        MD.createDate = date
+        MD.createDate = date2
     }
     let record3 = MD.ExpenseRecord {
         MD.billingID = 3,
         MD.title = "Lego",
-        MD.description = Just "payment for Lego",
+        MD.description = Just "bought lego as the birthday gift",
         MD.creditor = "Gabe",
         MD.debtors = ["Bob"],
         MD.amount = 30,
-        MD.createDate = date
+        MD.createDate = date2
     }
     let record4 = MD.ExpenseRecord {
         MD.billingID = 4,
-        MD.title = "Lego2",
-        MD.description = Just "payment for Lego",
+        MD.title = "another Lego",
+        MD.description = Just "another Lego for David",
         MD.creditor = "Gabe",
         MD.debtors = ["David"],
         MD.amount = 10,
-        MD.createDate = date
+        MD.createDate = date3
     }
     let record5 = MD.ExpenseRecord {
         MD.billingID = 5,
-        MD.title = "lunch",
-        MD.description = Just "payment for lunch",
+        MD.title = "Noodle House",
+        MD.description = Just "payment for the lunch at Noodle House",
         MD.creditor = "Bob",
         MD.debtors = ["Charile"],
         MD.amount = 40,
-        MD.createDate = date
+        MD.createDate = date2
     }
     let record6 = MD.ExpenseRecord {
         MD.billingID = 6,
-        MD.title = "ticket",
+        MD.title = "ticket of national park",
         MD.description = Just "payment for park ticket",
         MD.creditor = "Charile",
         MD.debtors = ["David"],
         MD.amount = 20,
-        MD.createDate = date
+        MD.createDate = date4
     }
     let record7 = MD.ExpenseRecord {
         MD.billingID = 7,
-        MD.title = "bread",
-        MD.description = Just "payment for 85C",
+        MD.title = "brutal death metal band tour",
+        MD.description = Just "Tickets for Brutal Metal Band Tour at Brick by brick!",
         MD.creditor = "David",
         MD.debtors = ["Ema"],
         MD.amount = 50,
-        MD.createDate = date
+        MD.createDate = date4
     }
     let dropTable = "DROP TABLE IF EXISTS mock"
     execDDL dropTable
